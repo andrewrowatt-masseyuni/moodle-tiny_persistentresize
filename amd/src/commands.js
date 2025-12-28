@@ -58,5 +58,21 @@ export const getSetup = async() => {
                 Notification.alert("Plugin tiny_persistentresize", "You just selected an item from a menu");
             },
         });
+
+        // Prototype resize event tracking.
+        editor.on('ResizeEditor', function() {
+            const target = editor.getElement();
+            localStorage.setItem(`tinymce_height_${target.id}`, editor.editorContainer.style.height);
+        });
+
+        editor.on('init', () => {
+            window.console.log('tiny_persistentresize init');
+            const target = editor.getElement();
+            const storedheight = localStorage.getItem(`tinymce_height_${target.id}`);
+            if (storedheight) {
+                window.console.log(`Restoring height for ${target.id} to ${storedheight}`);
+                editor.editorContainer.style.height = storedheight;
+            }
+        });
     };
 };
