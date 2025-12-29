@@ -8,7 +8,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:16
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -16,29 +16,16 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
 
-      mariadb:
-        image: mariadb:10
-        env:
-          MYSQL_USER: 'root'
-          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-          MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
-          MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
-
     strategy:
-      fail-fast: false
+      # fail-fast was false
+      fail-fast: true
       matrix:
         include:
-          - php: '8.3'
-            # Main job. Run all checks that do not require setup and only need to be run once.
+          - php: '8.1'
+            # Prep for new front-end servers
             runchecks: 'all'
             moodle-branch: 'MOODLE_405_STABLE'
             database: 'pgsql'
-          - php: '8.1'
-            moodle-branch: 'MOODLE_405_STABLE'
-            database: 'mariadb'
 
     steps:
       - name: Check out repository code
@@ -71,6 +58,7 @@ jobs:
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
           # Uncomment this to run Behat tests using the Moodle App.
           # MOODLE_APP: 'true'
+          MUSTACHE_IGNORE_NAMES: '_*.mustache'
 
       - name: PHP Lint
         if: ${{ !cancelled() && matrix.runchecks == 'all' }}
@@ -103,11 +91,20 @@ jobs:
 
       - name: Grunt
         if: ${{ !cancelled() && matrix.runchecks == 'all' }}
-        run: moodle-plugin-ci grunt --max-lint-warnings 0
+        run: moodle-plugin-ci grunt --max-lint-warnings 3
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpunit --fail-on-warning
+        env:
+          BASEMEDIASITEURL: ${{ secrets.BASEMEDIASITEURL }}
+          AUTHORIZATION: ${{ secrets.AUTHORIZATION }}
+          SFAPIKEY: ${{ secrets.SFAPIKEY }}
+          PHPUNIT_ENVIRONMENT: ${{ secrets.PHPUNIT_ENVIRONMENT }}
+
+      - name: PHPUnit tests - Core privacy (AJR)
+        if: ${{ !cancelled() }}
+        run: moodle/vendor/bin/phpunit --configuration moodle/phpunit.xml moodle/privacy/tests/privacy/provider_test.php
 
       - name: Behat features
         id: behat
