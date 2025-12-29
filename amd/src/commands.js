@@ -39,6 +39,7 @@ export const getSetup = async() => {
         clearAllConfirmMessage,
         clearAllSuccessTitle,
         clearAllSuccessMessage,
+        yesString,
     ] = await Promise.all([
         getString('menutitle', component),
         getButtonImage('menuicon', component),
@@ -49,6 +50,7 @@ export const getSetup = async() => {
         getString('clearallconfirmmessage', component),
         getString('clearallsuccesstitle', component),
         getString('clearallsuccessmessage', component),
+        getString('yes', 'core'),
     ]);
 
     return (editor) => {
@@ -78,13 +80,13 @@ export const getSetup = async() => {
             icon,
             text: clearAllMenuTitle,
             onAction: () => {
-                 // Show confirmation dialog.
+                // Show confirmation dialog.
                 ModalFactory.create({
                     type: ModalFactory.types.SAVE_CANCEL,
                     title: clearAllConfirmTitle,
                     body: clearAllConfirmMessage,
                 }).then((modal) => {
-                    modal.setSaveButtonText(getString('yes', 'core'));
+                    modal.setSaveButtonText(yesString);
                     modal.getRoot().on(ModalEvents.save, () => {
                         // Save the current editor's default height before clearing.
                         const target = editor.getElement();
