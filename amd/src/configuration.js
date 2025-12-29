@@ -22,12 +22,11 @@
  */
 
 import {buttonName} from 'tiny_persistentresize/common';
-import {addToolbarButton, addMenubarItem} from 'editor_tiny/utils';
+import {addMenubarItem} from 'editor_tiny/utils';
 
 export const configure = (instanceConfig) => {
     // Update the instance configuration to add the persistentresize option to the toolbar and menu.
     return {
-        toolbar: addToolbarButton(instanceConfig.toolbar, 'content', buttonName),
-        menu: addMenubarItem(instanceConfig.menu, 'insert', buttonName),
+        menu: addMenubarItem(instanceConfig.menu, 'tools', ' | ' + buttonName)
     };
 };

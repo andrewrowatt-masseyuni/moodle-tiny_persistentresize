@@ -28,51 +28,56 @@ import Notification from 'core/notification';
 
 export const getSetup = async() => {
     const [
-        buttonTitle,
-        buttonImage,
+        menuTitle,
+        menuImage,
+        confirmationTitle,
+        confirmationMessage,
     ] = await Promise.all([
-        getString('buttontitle', component),
+        getString('menutitle', component),
         getButtonImage('icon', component),
+        getString('confirmationtitle', component),
+        getString('confirmationmessage', component),
     ]);
 
     return (editor) => {
         // Register the persistentresize icon.
-        editor.ui.registry.addIcon(icon, buttonImage.html);
-
-        // Register the toolbar Button.
-        editor.ui.registry.addButton(buttonName, {
-            icon,
-            tooltip: buttonTitle,
-            onAction: () => {
-                // TODO do the action when toolbar button is pressed.
-                Notification.alert("Plugin tiny_persistentresize", "You just pressed a toolbar button");
-            },
-        });
+        editor.ui.registry.addIcon(icon, menuImage.html);
 
         // Register the Menu item.
         editor.ui.registry.addMenuItem(buttonName, {
             icon,
-            text: buttonTitle,
+            text: menuTitle,
             onAction: () => {
-                // TODO do the action when item is selected from the menu.
-                Notification.alert("Plugin tiny_persistentresize", "You just selected an item from a menu");
+                const target = editor.getElement();
+                const storedDefaultheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}_default`);
+
+                // Reset to default height and remove stored height preference.
+                // Tiny will handle the actual resize and a null height with a sensible default.
+                editor.editorContainer.style.height = storedDefaultheight;
+                localStorage.removeItem(`tiny_persistentresize_height_${target.id}`);
+                localStorage.removeItem(`tiny_persistentresize_height_${target.id}_default`);
+                // Notify the user.
+                Notification.alert(confirmationTitle, confirmationMessage);
             },
         });
 
-        // Prototype resize event tracking.
-        editor.on('ResizeEditor', function() {
-            const target = editor.getElement();
-            localStorage.setItem(`tinymce_height_${target.id}`, editor.editorContainer.style.height);
-        });
-
+        // Restore the editor height from localStorage if it exists.
         editor.on('init', () => {
-            window.console.log('tiny_persistentresize init');
             const target = editor.getElement();
-            const storedheight = localStorage.getItem(`tinymce_height_${target.id}`);
+
+            // Store the default height in case the user wants to reset it later.
+            localStorage.setItem(`tiny_persistentresize_height_${target.id}_default`, editor.editorContainer.style.height);
+
+            const storedheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}`);
             if (storedheight) {
-                window.console.log(`Restoring height for ${target.id} to ${storedheight}`);
                 editor.editorContainer.style.height = storedheight;
             }
+        });
+
+        // Store the editor height in localStorage whenever it is resized.
+        editor.on('ResizeEditor', function() {
+            const target = editor.getElement();
+            localStorage.setItem(`tiny_persistentresize_height_${target.id}`, editor.editorContainer.style.height);
         });
     };
 };
