@@ -25,6 +25,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['clearallconfirmmessage'] = 'This will clear all saved editor size preferences. The current editor will be reset immediately, but other editors (even on this page) will not take effect until the page is reloaded. Are you sure you want to continue?';
+$string['clearallconfirmtitle'] = 'Clear all editor size preferences?';
+$string['clearallmenutitle'] = 'Clear all editor size preferences';
+$string['clearallsuccessmessage'] = 'All editor size preferences have been cleared. The current editor has been reset. Other editors will reset when the page is reloaded.';
+$string['clearallsuccesstitle'] = 'All preferences cleared';
 $string['confirmationmessage'] = 'The editor size preference for this editor has been cleared. The editor will now use the default size.';
 $string['confirmationtitle'] = 'Editor size preference cleared';
 $string['menutitle'] = 'Clear editor size preference (for this editor)';
