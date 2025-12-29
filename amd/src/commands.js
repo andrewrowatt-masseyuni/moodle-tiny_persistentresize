@@ -91,7 +91,7 @@ export const getSetup = async() => {
                         // Save the current editor's default height before clearing.
                         const target = editor.getElement();
                         const storedDefaultheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}_default`);
-                        
+
                         // Clear all localStorage items related to this plugin.
                         const keysToRemove = [];
                         for (let i = 0; i < localStorage.length; i++) {
