@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['confirmationmessage'] = 'The editor size preference for this editor has been cleared. The editor will now use the default size.';
+$string['confirmationtitle'] = 'Editor size preference cleared';
 $string['menutitle'] = 'Clear editor size preference (for this editor)';
 $string['pluginname'] = 'Persistent resize';
 $string['privacy:metadata'] = 'The Persistent resize plugin doesn\'t store any personal data.';
-$string['confirmationtitle'] = 'Editor size preference cleared';
-$string['confirmationmessage'] = 'The editor size preference for this editor has been cleared. The editor will now use the default size.';
