@@ -78,7 +78,7 @@ export const getSetup = async() => {
             icon,
             text: clearAllMenuTitle,
             onAction: () => {
-                // Show confirmation dialog.
+                 // Show confirmation dialog.
                 ModalFactory.create({
                     type: ModalFactory.types.SAVE_CANCEL,
                     title: clearAllConfirmTitle,
@@ -86,6 +86,10 @@ export const getSetup = async() => {
                 }).then((modal) => {
                     modal.setSaveButtonText(getString('yes', 'core'));
                     modal.getRoot().on(ModalEvents.save, () => {
+                        // Save the current editor's default height before clearing.
+                        const target = editor.getElement();
+                        const storedDefaultheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}_default`);
+                        
                         // Clear all localStorage items related to this plugin.
                         const keysToRemove = [];
                         for (let i = 0; i < localStorage.length; i++) {
@@ -97,8 +101,6 @@ export const getSetup = async() => {
                         keysToRemove.forEach(key => localStorage.removeItem(key));
 
                         // Reset the current editor to default height.
-                        const target = editor.getElement();
-                        const storedDefaultheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}_default`);
                         if (storedDefaultheight) {
                             editor.editorContainer.style.height = storedDefaultheight;
                         }
