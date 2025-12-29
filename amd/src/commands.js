@@ -34,7 +34,7 @@ export const getSetup = async() => {
         confirmationMessage,
     ] = await Promise.all([
         getString('menutitle', component),
-        getButtonImage('icon', component),
+        getButtonImage('menuicon', component),
         getString('confirmationtitle', component),
         getString('confirmationmessage', component),
     ]);
