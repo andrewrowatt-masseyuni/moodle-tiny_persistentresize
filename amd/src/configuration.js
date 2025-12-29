@@ -21,12 +21,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import {buttonName} from 'tiny_persistentresize/common';
+import {buttonName, clearAllButtonName} from 'tiny_persistentresize/common';
 import {addMenubarItem} from 'editor_tiny/utils';
 
 export const configure = (instanceConfig) => {
     // Update the instance configuration to add the persistentresize option to the toolbar and menu.
     return {
-        menu: addMenubarItem(instanceConfig.menu, 'tools', ' | ' + buttonName)
+        menu: addMenubarItem(instanceConfig.menu, 'tools', ` | ${buttonName} ${clearAllButtonName}`)
     };
 };

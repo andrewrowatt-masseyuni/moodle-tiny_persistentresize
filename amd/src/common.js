@@ -26,4 +26,5 @@ export default {
     pluginName: 'tiny_persistentresize/persistentresize',
     icon: 'tiny_persistentresize',
     buttonName: 'tiny_persistentresize',
+    clearAllButtonName: 'tiny_persistentresize_clearall',
 };
