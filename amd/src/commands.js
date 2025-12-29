@@ -23,7 +23,7 @@
 
 import {getButtonImage} from 'editor_tiny/utils';
 import {get_string as getString} from 'core/str';
-import {component, buttonName, clearAllButtonName, icon} from 'tiny_persistentresize/common';
+import {component, buttonName, clearAllButtonName, icon, iconclearall} from 'tiny_persistentresize/common';
 import Notification from 'core/notification';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
@@ -32,6 +32,7 @@ export const getSetup = async() => {
     const [
         menuTitle,
         menuImage,
+        menuClearAllImage,
         confirmationTitle,
         confirmationMessage,
         clearAllMenuTitle,
@@ -43,6 +44,7 @@ export const getSetup = async() => {
     ] = await Promise.all([
         getString('menutitle', component),
         getButtonImage('menuicon', component),
+        getButtonImage('menuclearallicon', component),
         getString('confirmationtitle', component),
         getString('confirmationmessage', component),
         getString('clearallmenutitle', component),
@@ -56,6 +58,7 @@ export const getSetup = async() => {
     return (editor) => {
         // Register the persistentresize icon.
         editor.ui.registry.addIcon(icon, menuImage.html);
+        editor.ui.registry.addIcon(iconclearall, menuClearAllImage.html);
 
         // Register the Menu item.
         editor.ui.registry.addMenuItem(buttonName, {
@@ -77,7 +80,7 @@ export const getSetup = async() => {
 
         // Register the "Clear All" Menu item.
         editor.ui.registry.addMenuItem(clearAllButtonName, {
-            icon,
+            icon: iconclearall,
             text: clearAllMenuTitle,
             onAction: () => {
                 // Show confirmation dialog.
