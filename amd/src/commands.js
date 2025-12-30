@@ -23,25 +23,42 @@
 
 import {getButtonImage} from 'editor_tiny/utils';
 import {get_string as getString} from 'core/str';
-import {component, buttonName, icon} from 'tiny_persistentresize/common';
+import {component, buttonName, clearAllButtonName, icon, iconclearall} from 'tiny_persistentresize/common';
 import Notification from 'core/notification';
+import ModalFactory from 'core/modal_factory';
+import ModalEvents from 'core/modal_events';
 
 export const getSetup = async() => {
     const [
         menuTitle,
         menuImage,
+        menuClearAllImage,
         confirmationTitle,
         confirmationMessage,
+        clearAllMenuTitle,
+        clearAllConfirmTitle,
+        clearAllConfirmMessage,
+        clearAllSuccessTitle,
+        clearAllSuccessMessage,
+        yesString,
     ] = await Promise.all([
         getString('menutitle', component),
         getButtonImage('menuicon', component),
+        getButtonImage('menuclearallicon', component),
         getString('confirmationtitle', component),
         getString('confirmationmessage', component),
+        getString('clearallmenutitle', component),
+        getString('clearallconfirmtitle', component),
+        getString('clearallconfirmmessage', component),
+        getString('clearallsuccesstitle', component),
+        getString('clearallsuccessmessage', component),
+        getString('yes', 'core'),
     ]);
 
     return (editor) => {
         // Register the persistentresize icon.
         editor.ui.registry.addIcon(icon, menuImage.html);
+        editor.ui.registry.addIcon(iconclearall, menuClearAllImage.html);
 
         // Register the Menu item.
         editor.ui.registry.addMenuItem(buttonName, {
@@ -58,6 +75,47 @@ export const getSetup = async() => {
                 localStorage.removeItem(`tiny_persistentresize_height_${target.id}_default`);
                 // Notify the user.
                 Notification.alert(confirmationTitle, confirmationMessage);
+            },
+        });
+
+        // Register the "Clear All" Menu item.
+        editor.ui.registry.addMenuItem(clearAllButtonName, {
+            icon: iconclearall,
+            text: clearAllMenuTitle,
+            onAction: () => {
+                // Show confirmation dialog.
+                ModalFactory.create({
+                    type: ModalFactory.types.SAVE_CANCEL,
+                    title: clearAllConfirmTitle,
+                    body: clearAllConfirmMessage,
+                }).then((modal) => {
+                    modal.setSaveButtonText(yesString);
+                    modal.getRoot().on(ModalEvents.save, () => {
+                        // Save the current editor's default height before clearing.
+                        const target = editor.getElement();
+                        const storedDefaultheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}_default`);
+
+                        // Clear all localStorage items related to this plugin.
+                        const keysToRemove = [];
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (key && key.startsWith('tiny_persistentresize_height_')) {
+                                keysToRemove.push(key);
+                            }
+                        }
+                        keysToRemove.forEach(key => localStorage.removeItem(key));
+
+                        // Reset the current editor to default height.
+                        if (storedDefaultheight) {
+                            editor.editorContainer.style.height = storedDefaultheight;
+                        }
+
+                        // Notify the user.
+                        Notification.alert(clearAllSuccessTitle, clearAllSuccessMessage);
+                    });
+                    modal.show();
+                    return modal;
+                }).catch(Notification.exception);
             },
         });
 
