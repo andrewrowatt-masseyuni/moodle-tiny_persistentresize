@@ -77,12 +77,14 @@ To clear a saved height preference for all editors:
 
 ## Icons
 
-*Close* by Marek Polakovic from [Noun Project](https://thenounproject.com/icon/close-142255/) (CC BY 3.0).
+*Close* by Marek Polakovic from [Noun Project](https://thenounproject.com/icon/close-142258) (CC BY 3.0)
 
-*Close all* by Marek Polakovic from [Noun Project](https://thenounproject.com/icon/close-142258/) (CC BY 3.0)
+*Close all* by Marek Polakovic from [Noun Project](https://thenounproject.com/icon/close-142255) (CC BY 3.0).
+
 
 ## License
 
 This plugin is licensed under the GNU GPL v3 or later.
 
 Copyright 2025 Andrew Rowatt [A.J.Rowatt@massey.ac.nz](mailto:A.J.Rowatt@massey.ac.nz)
+
