@@ -152,16 +152,21 @@ export const getSetup = async() => {
         });
 
         // Store the editor height in IndexedDB whenever it is resized.
+        // Debounce to prevent excessive writes during rapid resize operations.
+        let resizeTimeout;
         editor.on('ResizeEditor', async () => {
-            const target = editor.getElement();
-            const username = getUsername(editor);
-            const heightKey = `${username}_tiny_persistentresize_height_${target.id}`;
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(async () => {
+                const target = editor.getElement();
+                const username = getUsername(editor);
+                const heightKey = `${username}_tiny_persistentresize_height_${target.id}`;
 
-            try {
-                await Storage.setItem(heightKey, editor.editorContainer.style.height);
-            } catch (error) {
-                Notification.exception(error);
-            }
+                try {
+                    await Storage.setItem(heightKey, editor.editorContainer.style.height);
+                } catch (error) {
+                    Notification.exception(error);
+                }
+            }, 300); // Wait 300ms after resize stops before saving
         });
     };
 };

@@ -69,6 +69,8 @@ class plugininfo extends plugin implements plugin_with_buttons, plugin_with_conf
         ?editor $editor = null
     ): array {
         global $USER;
+        // Username is used to scope IndexedDB storage keys per user, preventing crossover
+        // between users on the same browser/computer. This is stored client-side only.
         return [
             'contextid' => $context->id,
             'username' => $USER->username ?? '',
