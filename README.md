@@ -1,20 +1,21 @@
 # Persistent Resize - TinyMCE plugin for Moodle
 
-A TinyMCE editor plugin for Moodle that remembers the height of each editor instance between page loads.
+A TinyMCE editor plugin for Moodle that remembers the height of each editor instance between page loads using IndexedDB.
 
 ## Description
 
-When users resize the TinyMCE editor by dragging the resize handle, this plugin automatically saves the new height to the browser's localStorage. The next time the user visits a page with that same editor, it will be restored to their preferred height.
+When users resize the TinyMCE editor by dragging the resize handle, this plugin automatically saves the new height to the browser's IndexedDB. The next time the user visits a page with that same editor, it will be restored to their preferred height.
 
-Each editor instance is tracked separately by its element ID, so users can have different preferred heights for different editors throughout Moodle.
+Each editor instance is tracked separately by its element ID, and storage is scoped per user to prevent crossover between different users on the same computer and browser.
 
 ## Features
 
 -   Automatically saves editor height when resized
 -   Restores saved height on page load
 -   Per-editor height preferences (different editors can have different heights)
+-   Per-user storage using IndexedDB (data persists between sessions and is scoped to each user)
 -   Menu option to clear the saved height preference and reset to default
--   No server-side storage required (uses browser localStorage). Note this also means sizes are not sync'ed across browsers or devices. This is intentional.
+-   No server-side storage required (uses browser IndexedDB). Note this also means sizes are not sync'ed across browsers or devices. This is intentional.
 
 ## Requirements
 
