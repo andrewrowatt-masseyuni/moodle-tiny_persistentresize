@@ -66,7 +66,7 @@ export const getSetup = async() => {
         editor.ui.registry.addMenuItem(buttonName, {
             icon,
             text: menuTitle,
-            onAction: async () => {
+            onAction: async() => {
                 const target = editor.getElement();
                 const username = getUsername(editor);
                 const defaultKey = `${username}_tiny_persistentresize_height_${target.id}_default`;
@@ -100,7 +100,7 @@ export const getSetup = async() => {
                     body: clearAllConfirmMessage,
                 }).then((modal) => {
                     modal.setSaveButtonText(yesString);
-                    modal.getRoot().on(ModalEvents.save, async () => {
+                    modal.getRoot().on(ModalEvents.save, async() => {
                         try {
                             // Save the current editor's default height before clearing.
                             const target = editor.getElement();
@@ -132,7 +132,7 @@ export const getSetup = async() => {
         });
 
         // Restore the editor height from IndexedDB if it exists.
-        editor.on('init', async () => {
+        editor.on('init', async() => {
             const target = editor.getElement();
             const username = getUsername(editor);
             const defaultKey = `${username}_tiny_persistentresize_height_${target.id}_default`;
@@ -154,9 +154,9 @@ export const getSetup = async() => {
         // Store the editor height in IndexedDB whenever it is resized.
         // Debounce to prevent excessive writes during rapid resize operations.
         let resizeTimeout;
-        editor.on('ResizeEditor', async () => {
+        editor.on('ResizeEditor', async() => {
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(async () => {
+            resizeTimeout = setTimeout(async() => {
                 const target = editor.getElement();
                 const username = getUsername(editor);
                 const heightKey = `${username}_tiny_persistentresize_height_${target.id}`;

@@ -51,7 +51,7 @@ const openDB = () => {
  * @param {string} value - The value to store
  * @returns {Promise<void>}
  */
-export const setItem = async (key, value) => {
+export const setItem = async(key, value) => {
     const db = await openDB();
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
@@ -70,7 +70,7 @@ export const setItem = async (key, value) => {
  * @param {string} key - The key to retrieve the value for
  * @returns {Promise<string|null>}
  */
-export const getItem = async (key) => {
+export const getItem = async(key) => {
     const db = await openDB();
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readonly');
@@ -89,7 +89,7 @@ export const getItem = async (key) => {
  * @param {string} key - The key to remove
  * @returns {Promise<void>}
  */
-export const removeItem = async (key) => {
+export const removeItem = async(key) => {
     const db = await openDB();
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
@@ -107,7 +107,7 @@ export const removeItem = async (key) => {
  * Get all keys from IndexedDB
  * @returns {Promise<Array<string>>}
  */
-export const getAllKeys = async () => {
+export const getAllKeys = async() => {
     const db = await openDB();
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readonly');
