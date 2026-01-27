@@ -25,6 +25,7 @@ import {getPluginOptionName} from 'editor_tiny/options';
 import {pluginName} from 'tiny_persistentresize/common';
 
 const contextIdName = getPluginOptionName(pluginName, 'contextid');
+const usernameName = getPluginOptionName(pluginName, 'username');
 
 /**
  * Register the options for the persistentresize plugin.
@@ -38,6 +39,11 @@ export const register = (editor) => {
         processor: 'number',
         "default": 0,
     });
+
+    registerOption(usernameName, {
+        processor: 'string',
+        "default": '',
+    });
 };
 
 /**
@@ -47,3 +53,11 @@ export const register = (editor) => {
  * @returns {number}
  */
 export const getContextId = (editor) => editor.options.get(contextIdName);
+
+/**
+ * Get the username.
+ *
+ * @param {TinyMCE} editor
+ * @returns {string}
+ */
+export const getUsername = (editor) => editor.options.get(usernameName);
