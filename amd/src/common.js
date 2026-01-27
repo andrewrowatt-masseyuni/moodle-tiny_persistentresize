@@ -23,7 +23,7 @@
 
 export default {
     component: 'tiny_persistentresize',
-    pluginName: 'tiny_persistentresize/persistentresize',
+    pluginName: 'tiny_persistentresize/plugin',
     icon: 'tiny_persistentresize',
     iconclearall: 'tiny_persistentresize_clearall',
     buttonName: 'tiny_persistentresize',

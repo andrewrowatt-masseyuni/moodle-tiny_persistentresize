@@ -22,10 +22,10 @@
  */
 
 import {getPluginOptionName} from 'editor_tiny/options';
-import {component, pluginName} from 'tiny_persistentresize/common';
+import {pluginName} from 'tiny_persistentresize/common';
 
-const contextIdName = getPluginOptionName(component, 'contextid');
-const usernameName = getPluginOptionName(component, 'username');
+const contextIdName = getPluginOptionName(pluginName, 'contextid');
+const usernameName = getPluginOptionName(pluginName, 'username');
 
 /**
  * Register the options for the persistentresize plugin.
