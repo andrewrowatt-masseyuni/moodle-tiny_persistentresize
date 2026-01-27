@@ -27,6 +27,8 @@ import {component, buttonName, clearAllButtonName, icon, iconclearall} from 'tin
 import Notification from 'core/notification';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
+import {getUsername} from 'tiny_persistentresize/options';
+import * as Storage from 'tiny_persistentresize/storage';
 
 export const getSetup = async() => {
     const [
@@ -64,17 +66,25 @@ export const getSetup = async() => {
         editor.ui.registry.addMenuItem(buttonName, {
             icon,
             text: menuTitle,
-            onAction: () => {
+            onAction: async() => {
                 const target = editor.getElement();
-                const storedDefaultheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}_default`);
+                const username = getUsername(editor);
+                const defaultKey = `${username}_tiny_persistentresize_height_${target.id}_default`;
+                const heightKey = `${username}_tiny_persistentresize_height_${target.id}`;
 
-                // Reset to default height and remove stored height preference.
-                // Tiny will handle the actual resize and a null height with a sensible default.
-                editor.editorContainer.style.height = storedDefaultheight;
-                localStorage.removeItem(`tiny_persistentresize_height_${target.id}`);
-                localStorage.removeItem(`tiny_persistentresize_height_${target.id}_default`);
-                // Notify the user.
-                Notification.alert(confirmationTitle, confirmationMessage);
+                try {
+                    const storedDefaultheight = await Storage.getItem(defaultKey);
+
+                    // Reset to default height and remove stored height preference.
+                    // Tiny will handle the actual resize and a null height with a sensible default.
+                    editor.editorContainer.style.height = storedDefaultheight;
+                    await Storage.removeItem(heightKey);
+                    await Storage.removeItem(defaultKey);
+                    // Notify the user.
+                    Notification.alert(confirmationTitle, confirmationMessage);
+                } catch (error) {
+                    Notification.exception(error);
+                }
             },
         });
 
@@ -90,28 +100,30 @@ export const getSetup = async() => {
                     body: clearAllConfirmMessage,
                 }).then((modal) => {
                     modal.setSaveButtonText(yesString);
-                    modal.getRoot().on(ModalEvents.save, () => {
-                        // Save the current editor's default height before clearing.
-                        const target = editor.getElement();
-                        const storedDefaultheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}_default`);
+                    modal.getRoot().on(ModalEvents.save, async() => {
+                        try {
+                            // Save the current editor's default height before clearing.
+                            const target = editor.getElement();
+                            const username = getUsername(editor);
+                            const defaultKey = `${username}_tiny_persistentresize_height_${target.id}_default`;
+                            const storedDefaultheight = await Storage.getItem(defaultKey);
 
-                        // Clear all localStorage items related to this plugin.
-                        const keysToRemove = [];
-                        for (let i = 0; i < localStorage.length; i++) {
-                            const key = localStorage.key(i);
-                            if (key && key.startsWith('tiny_persistentresize_height_')) {
-                                keysToRemove.push(key);
+                            // Clear all IndexedDB items related to this plugin for this user.
+                            const allKeys = await Storage.getAllKeys();
+                            const prefix = `${username}_tiny_persistentresize_height_`;
+                            const keysToRemove = allKeys.filter(key => key.startsWith(prefix));
+                            await Promise.all(keysToRemove.map(key => Storage.removeItem(key)));
+
+                            // Reset the current editor to default height.
+                            if (storedDefaultheight) {
+                                editor.editorContainer.style.height = storedDefaultheight;
                             }
-                        }
-                        keysToRemove.forEach(key => localStorage.removeItem(key));
 
-                        // Reset the current editor to default height.
-                        if (storedDefaultheight) {
-                            editor.editorContainer.style.height = storedDefaultheight;
+                            // Notify the user.
+                            Notification.alert(clearAllSuccessTitle, clearAllSuccessMessage);
+                        } catch (error) {
+                            Notification.exception(error);
                         }
-
-                        // Notify the user.
-                        Notification.alert(clearAllSuccessTitle, clearAllSuccessMessage);
                     });
                     modal.show();
                     return modal;
@@ -119,23 +131,42 @@ export const getSetup = async() => {
             },
         });
 
-        // Restore the editor height from localStorage if it exists.
-        editor.on('init', () => {
+        // Restore the editor height from IndexedDB if it exists.
+        editor.on('init', async() => {
             const target = editor.getElement();
+            const username = getUsername(editor);
+            const defaultKey = `${username}_tiny_persistentresize_height_${target.id}_default`;
+            const heightKey = `${username}_tiny_persistentresize_height_${target.id}`;
 
-            // Store the default height in case the user wants to reset it later.
-            localStorage.setItem(`tiny_persistentresize_height_${target.id}_default`, editor.editorContainer.style.height);
+            try {
+                // Store the default height in case the user wants to reset it later.
+                await Storage.setItem(defaultKey, editor.editorContainer.style.height);
 
-            const storedheight = localStorage.getItem(`tiny_persistentresize_height_${target.id}`);
-            if (storedheight) {
-                editor.editorContainer.style.height = storedheight;
+                const storedheight = await Storage.getItem(heightKey);
+                if (storedheight) {
+                    editor.editorContainer.style.height = storedheight;
+                }
+            } catch (error) {
+                Notification.exception(error);
             }
         });
 
-        // Store the editor height in localStorage whenever it is resized.
-        editor.on('ResizeEditor', function() {
-            const target = editor.getElement();
-            localStorage.setItem(`tiny_persistentresize_height_${target.id}`, editor.editorContainer.style.height);
+        // Store the editor height in IndexedDB whenever it is resized.
+        // Debounce to prevent excessive writes during rapid resize operations.
+        let resizeTimeout;
+        editor.on('ResizeEditor', async() => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(async() => {
+                const target = editor.getElement();
+                const username = getUsername(editor);
+                const heightKey = `${username}_tiny_persistentresize_height_${target.id}`;
+
+                try {
+                    await Storage.setItem(heightKey, editor.editorContainer.style.height);
+                } catch (error) {
+                    Notification.exception(error);
+                }
+            }, 300); // Wait 300ms after resize stops before saving
         });
     };
 };
